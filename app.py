@@ -100,43 +100,57 @@ def get_product_by_barcode(barcode):
     return {
         "product_name": product.get("product_name", "Unknown"),
         "brands": product.get("brands", "Unknown"),
-        "ingredients_text": product.get("Ingredients_text", ""),
+        "ingredients_text": product.get("ingredients_text", ""),
         "barcode": barcode,
     }
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-OPEN_FOOD_FACTS = "https://world.openfoodfacts.org"
-
-def find_item(item_id):
-    """Return the item with this id, or None if it does not exist."""
-    for item in inventory:
-        if item["id"] == item_id:
-            return item
+def get_product_by_name(name):
+    """Search by name. Returns the first maitch as a dictionary, or None."""
+    url = "https://world.openfoodfacts.org/cgi/search.pl"
+    params = {
+        "search_terms": name,
+        "search_simple": 1,
+        "action": "process",
+        "json": 1,
+        "page_size": 1,
+    }
+    response = requests.get("products", [])
+    if len(products) == 0:
         return None
 
+    product = products[0]
+    return {
+        "product_name": product.get("product_name", "Unknown"),
+        "brands": product.get("brands", "Unknown"),
+        "ingredients_text": product.get("ingredients_text", ""),
+        "barcode": product.code("code", ""),
+    }
 
-def get_next_id():
-    """Return the next free id"""
+
+@app.route("/search/barcode/<barcode>", methods=["GET"])
+def search_by_barcode(barcode):
+    try:
+        product = get_product_by_barcode(barcode)
+    except requests.exceptions.RequestException:
+        return jsonify({"error": "Could not reach the OpenFoodsFacts API"}), 503
+
+    if product is None:
+        return jsonify({"error": "Product not found"}), 404
+    return jsonify(product)
+
+
+@app.route("/search/name/<name>", methods=["GET"])
+def search_by_name(name):
+    try:
+        product = get_product_by_name(name)
+    except requests.exceptions.RequestException:
+        return jsonify({"error": "Could not reach the OpenFoodFacts API"}), 503
+
+    if product is None:
+        return jsonify({"error": "Product not found"}), 404
+    return jsonify(product)
+
 
 if __name__ == "__main__":
     app.run(port=5555, debug=True)
