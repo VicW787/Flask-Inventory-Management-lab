@@ -2,8 +2,11 @@
 An inventory tool for a retail company:
 
 (a) A FlaskRESTAPI with full CRUD(Create,Read,Update,Delete)
+
 (b) OpenFoodFacts lookups by barcode or product name
+
 (c) A CLI to use the API from the terminal
+
 (d) Tests written with pytest and unittest.mock
 
 The inventory is stored in a Python list in *app.py*, so it resets every time the server restarts.
