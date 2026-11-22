@@ -101,10 +101,10 @@ def update_item():
         return
 
     if changes == {}:
-        print("Invalid number. Nothing was updated.")
+        print("Nothing to update.")
         return
 
-    response =  requests.patch(f"{Base_url}/inventory/{item_id}", json=changes)
+    response = requests.patch(f"{Base_url}/inventory/{item_id}", json=changes)
     if response.status_code == 200:
         print("Item updated!")
         show_item(response.json())
@@ -131,7 +131,7 @@ def find_on_api():
     choice = input("Choose 1 or 2: ")
 
     if choice == "1":
-        barcode == input("Enter the barcode: ")
+        barcode = input("Enter the barcode: ")
         if barcode == "":
             print("The barcode cannot be empty.")
             return
@@ -192,7 +192,7 @@ def main():
             elif choice == "4":
                 update_item()
             elif choice == "5":
-                delete_item
+                delete_item()
             elif choice == "6":
                 find_on_api()
             elif choice == "7":
@@ -204,7 +204,7 @@ def main():
             print("Could not reach the server. is app.py running?")
 
 
-if __name__ == "__main__"
+if __name__ == "__main__":
     main()
 
 

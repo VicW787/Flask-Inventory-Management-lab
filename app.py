@@ -17,7 +17,7 @@ inventory = [
         "id": 2,
         "product_name": "Crunchy Peanut Butter",
         "brands": "Jif",
-        "ingredients_text": "Roassted peanuts, sugar, molasses, salt",
+        "ingredients_text": "Roasted peanuts, sugar, molasses, salt",
         "barcode": "0051500240006",
         "price": 4.49,
         "stock": 40,
@@ -56,7 +56,8 @@ def create_item():
         "id": new_id,
         "product_name": data["product_name"],
         "brands": data.get("brands", ""),
-        "ingredients_text": data.get("ingredients_text"), "barcode": data.get("barcode", ""),
+        "ingredients_text": data.get("ingredients_text", ""), 
+        "barcode": data.get("barcode", ""),
         "price": data.get("price", 0),
         "stock": data.get("stock", 0),
     }
@@ -74,7 +75,7 @@ def update_item(id):
     for field in ["product_name", "brands", "ingredients_text", "barcode", "price", "stock"]:
         if field in data:
             item[field] = data[field]
-            return jsonify(item)
+    return jsonify(item)
 
 
 @app.route("/inventory/<int:id>", methods=["DELETE"])
@@ -115,7 +116,10 @@ def get_product_by_name(name):
         "json": 1,
         "page_size": 1,
     }
-    response = requests.get("products", [])
+    response = requests.get(url, params=params, timeout=10)
+    data = response.json
+
+    products = data.get("products", [])
     if len(products) == 0:
         return None
 
@@ -124,7 +128,7 @@ def get_product_by_name(name):
         "product_name": product.get("product_name", "Unknown"),
         "brands": product.get("brands", "Unknown"),
         "ingredients_text": product.get("ingredients_text", ""),
-        "barcode": product.code("code", ""),
+        "barcode": product.get("code", ""),
     }
 
 
@@ -133,7 +137,7 @@ def search_by_barcode(barcode):
     try:
         product = get_product_by_barcode(barcode)
     except requests.exceptions.RequestException:
-        return jsonify({"error": "Could not reach the OpenFoodsFacts API"}), 503
+        return jsonify({"error": "Could not reach the OpenFoodFacts API"}), 503
 
     if product is None:
         return jsonify({"error": "Product not found"}), 404
